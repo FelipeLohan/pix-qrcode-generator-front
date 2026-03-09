@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add src/app/services/pix.service.ts src/app/components/pix-form/pix-form.component.ts)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/api/pix/gerar -X POST -H \"Content-Type: application/json\" -d '{\"\"chavePix\"\":\"\"teste@teste.com\"\",\"\"nomeRecebedor\"\":\"\"Teste\"\",\"\"cidade\"\":\"\"SP\"\"}')",
+      "Bash(lsof -i :4200)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4200)",
+      "Bash(git add .claude/docs/backend-integration.md .claude/settings.json)"
+    ]
+  }
+}
