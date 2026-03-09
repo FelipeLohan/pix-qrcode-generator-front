@@ -83,8 +83,8 @@ export class PixFormComponent implements OnInit {
         this.qrCodeResult.set(resp.qrCodeBase64);
         this.isLoading.set(false);
       },
-      error: err => {
-        this.errorMsg.set(err?.error?.message ?? 'Erro ao gerar QR Code. Tente novamente.');
+      error: (err: Error) => {
+        this.errorMsg.set(err.message);
         this.isLoading.set(false);
       },
     });
