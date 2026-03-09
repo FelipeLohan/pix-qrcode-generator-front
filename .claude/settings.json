@@ -5,7 +5,13 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8080/api/pix/gerar -X POST -H \"Content-Type: application/json\" -d '{\"\"chavePix\"\":\"\"teste@teste.com\"\",\"\"nomeRecebedor\"\":\"\"Teste\"\",\"\"cidade\"\":\"\"SP\"\"}')",
       "Bash(lsof -i :4200)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4200)",
-      "Bash(git add .claude/docs/backend-integration.md .claude/settings.json)"
+      "Bash(git add .claude/docs/backend-integration.md .claude/settings.json)",
+      "Bash(grep -A3 '\"\"outputPath\"\"')",
+      "Bash(npx ng build --configuration=production)",
+      "Bash(docker build -t pix-qrcode-front:test .)",
+      "Bash(docker image inspect pix-qrcode-front:test --format='{{.Size}}')",
+      "Read(//home/work/vscode-ws/pix-qrcode-generator-front/{printf \"\"\"\"%.1f MB\\\\n\"\"\"\", $1/1024/**)",
+      "Bash(git add Dockerfile .dockerignore nginx/)"
     ]
   }
 }
