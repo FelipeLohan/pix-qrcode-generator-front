@@ -1,0 +1,104 @@
+<section class="card animate-fade-in">
+
+  <!-- Cabeçalho -->
+  <div class="mb-6 text-center">
+    <h1 class="text-2xl font-bold text-gray-900">Gerador de QR Code PIX</h1>
+    <p class="mt-1 text-sm text-gray-500">Gere um QR Code para receber qualquer valor via PIX</p>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="flex flex-col gap-4">
+
+    <!-- Tipo de Chave -->
+    <div class="form-field">
+      <label class="form-label" for="tipoChave">Tipo de Chave</label>
+      <select id="tipoChave" formControlName="tipoChave" class="form-input">
+        @for (tipo of tiposChave; track tipo) {
+          <option [value]="tipo">{{ tipo }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Chave PIX -->
+    <div class="form-field">
+      <label class="form-label" for="chavePix">Chave PIX</label>
+      <input
+        id="chavePix"
+        formControlName="chavePix"
+        class="form-input"
+        [placeholder]="chavePlaceholder()"
+        autocomplete="off"
+      />
+      @if (hasError('chavePix')) {
+        <span class="field-error">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 4.25a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zm-.75 6a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75z"/>
+          </svg>
+          Chave inválida para o tipo selecionado.
+        </span>
+      }
+    </div>
+
+    <!-- Nome do Recebedor -->
+    <div class="form-field">
+      <label class="form-label" for="nomeRecebedor">Nome do Recebedor</label>
+      <input
+        id="nomeRecebedor"
+        formControlName="nomeRecebedor"
+        class="form-input"
+        placeholder="Máx. 25 caracteres"
+        maxlength="25"
+      />
+      @if (hasError('nomeRecebedor')) {
+        <span class="field-error">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 4.25a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zm-.75 6a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75z"/>
+          </svg>
+          Nome obrigatório (máx. 25 caracteres).
+        </span>
+      }
+    </div>
+
+    <!-- Cidade -->
+    <div class="form-field">
+      <label class="form-label" for="cidade">Cidade</label>
+      <input
+        id="cidade"
+        formControlName="cidade"
+        class="form-input"
+        placeholder="Máx. 15 caracteres"
+        maxlength="15"
+      />
+      @if (hasError('cidade')) {
+        <span class="field-error">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 4.25a.75.75 0 0 0-1.5 0v3.5a.75.75 0 0 0 1.5 0v-3.5zm-.75 6a.875.875 0 1 0 0-1.75.875.875 0 0 0 0 1.75z"/>
+          </svg>
+          Cidade obrigatória (máx. 15 caracteres).
+        </span>
+      }
+    </div>
+
+    <!-- Erro global da API -->
+    @if (errorMsg()) {
+      <div class="alert-error animate-fade-in" role="alert">
+        {{ errorMsg() }}
+      </div>
+    }
+
+    <!-- Botão submit -->
+    <button type="submit" class="btn-primary mt-2" [disabled]="isLoading()">
+      @if (isLoading()) {
+        <span class="spinner"></span>
+        Gerando...
+      } @else {
+        Gerar QR Code
+      }
+    </button>
+
+  </form>
+
+  @if (qrCodeResult()) {
+    <app-qr-display [qrCodeBase64]="qrCodeResult()!" />
+  }
+
+</section>
