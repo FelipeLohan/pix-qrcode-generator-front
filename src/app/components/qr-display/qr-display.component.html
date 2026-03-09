@@ -1,0 +1,23 @@
+<div class="flex flex-col items-center gap-4 animate-fade-in">
+
+  <div class="divider"></div>
+
+  <p class="text-sm font-medium text-gray-500">QR Code gerado com sucesso</p>
+
+  <div class="rounded-xl border border-[--color-border] p-3 bg-white shadow-sm">
+    <img
+      [src]="'data:image/png;base64,' + qrCodeBase64()"
+      alt="QR Code PIX"
+      class="w-48 h-48 object-contain"
+    />
+  </div>
+
+  <button type="button" class="btn-secondary" (click)="download()">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 12.5a.75.75 0 0 1-.53-.22l-4-4a.75.75 0 0 1 1.06-1.06L7 9.69V2.75a.75.75 0 0 1 1.5 0v6.94l2.47-2.47a.75.75 0 1 1 1.06 1.06l-4 4a.75.75 0 0 1-.53.22z"/>
+      <path d="M2.75 13.5a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5H2.75z"/>
+    </svg>
+    Baixar PNG
+  </button>
+
+</div>
