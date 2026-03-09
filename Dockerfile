@@ -28,7 +28,7 @@ COPY --from=builder /app/dist/pix-qrcode-generator-front/browser /usr/share/ngin
 
 ENV NODE_ENV=production
 # Defina no Coolify: URL do serviço Spring Boot (ex: http://pix-backend:8080)
-ENV BACKEND_URL=http://localhost:8080
+ENV BACKEND_URL=https://qrcodegeneratorapi.felipelohan.com
 
 EXPOSE 3001
 
