@@ -30,6 +30,6 @@ ENV NODE_ENV=production
 # Defina no Coolify: URL do serviço Spring Boot (ex: http://pix-backend:8080)
 ENV BACKEND_URL=http://localhost:8080
 
-EXPOSE 80
+EXPOSE 3001
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
