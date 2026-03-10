@@ -15,12 +15,19 @@ const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
 };
 
 const CHAVE_PLACEHOLDERS: Record<TipoChave, string> = {
-  CPF:      '00000000000',
+  CPF:      '000.000.000-00',
   CNPJ:     '00000000000000',
   EMAIL:    'exemplo@email.com',
   TELEFONE: '+5511999999999',
   EVP:      'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
 };
+
+function formatCpf(digits: string): string {
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
+  if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+}
 
 @Component({
   selector: 'app-pix-form',
@@ -55,6 +62,20 @@ export class PixFormComponent implements OnInit {
       chaveCtrl.updateValueAndValidity();
       this.chavePlaceholder.set(CHAVE_PLACEHOLDERS[tipo]);
     });
+  }
+
+  onChavePixInput(event: Event): void {
+    if (this.form.get('tipoChave')!.value !== 'CPF') return;
+
+    const input = event.target as HTMLInputElement;
+    const digits = input.value.replace(/\D/g, '').slice(0, 11);
+
+    // Atualiza o display com máscara
+    input.value = formatCpf(digits);
+
+    // Form control armazena apenas os dígitos (valor enviado ao backend)
+    this.form.get('chavePix')!.setValue(digits, { emitEvent: false });
+    this.form.get('chavePix')!.markAsTouched();
   }
 
   hasError(field: keyof typeof this.form.controls): boolean {

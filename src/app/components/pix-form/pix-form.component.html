@@ -27,6 +27,7 @@
         class="form-input"
         [placeholder]="chavePlaceholder()"
         autocomplete="off"
+        (input)="onChavePixInput($event)"
       />
       @if (hasError('chavePix')) {
         <span class="field-error">
