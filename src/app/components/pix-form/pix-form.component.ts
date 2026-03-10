@@ -17,6 +17,14 @@ const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
   EVP:      Validators.pattern(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
 };
 
+const CHAVE_LABELS: Record<TipoChave, string> = {
+  CPF:      'CPF',
+  CNPJ:     'CNPJ',
+  EMAIL:    'E-mail',
+  TELEFONE: 'Telefone',
+  EVP:      'Chave Aleatória',
+};
+
 const CHAVE_PLACEHOLDERS: Record<TipoChave, string> = {
   CPF:      '000.000.000-00',
   CNPJ:     '00.000.000/0000-00',
@@ -37,6 +45,14 @@ function formatTelefone(digits: string): string {
   if (digits.length <= 6)  return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
   if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+}
+
+function formatEvp(hex: string): string {
+  if (hex.length <= 8)  return hex;
+  if (hex.length <= 12) return `${hex.slice(0, 8)}-${hex.slice(8)}`;
+  if (hex.length <= 16) return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12)}`;
+  if (hex.length <= 20) return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16)}`;
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20, 32)}`;
 }
 
 function formatCnpj(digits: string): string {
@@ -63,6 +79,7 @@ export class PixFormComponent implements OnInit {
   readonly errorMsg = signal<string | null>(null);
   readonly qrCodeResult = signal<string | null>(null);
   readonly chavePlaceholder = signal(CHAVE_PLACEHOLDERS['CPF']);
+  readonly chaveLabels = CHAVE_LABELS;
 
   readonly form = this.fb.group({
     tipoChave:     ['CPF' as TipoChave, Validators.required],
@@ -84,7 +101,7 @@ export class PixFormComponent implements OnInit {
 
   onChavePixInput(event: Event): void {
     const tipo = this.form.get('tipoChave')!.value;
-    if (tipo !== 'CPF' && tipo !== 'CNPJ' && tipo !== 'TELEFONE') return;
+    if (tipo !== 'CPF' && tipo !== 'CNPJ' && tipo !== 'TELEFONE' && tipo !== 'EVP') return;
 
     const input = event.target as HTMLInputElement;
     const chaveCtrl = this.form.get('chavePix')!;
@@ -95,9 +112,12 @@ export class PixFormComponent implements OnInit {
     } else if (tipo === 'CNPJ') {
       const digits = input.value.replace(/\D/g, '').slice(0, 14);
       chaveCtrl.setValue(formatCnpj(digits), { emitEvent: false });
-    } else {
+    } else if (tipo === 'TELEFONE') {
       const digits = input.value.replace(/\D/g, '').slice(0, 11);
       chaveCtrl.setValue(formatTelefone(digits), { emitEvent: false });
+    } else {
+      const hex = input.value.replace(/[^0-9a-fA-F]/g, '').slice(0, 32);
+      chaveCtrl.setValue(formatEvp(hex), { emitEvent: false });
     }
 
     chaveCtrl.markAsTouched();

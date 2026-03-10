@@ -13,7 +13,7 @@
       <label class="form-label" for="tipoChave">Tipo de Chave</label>
       <select id="tipoChave" formControlName="tipoChave" class="form-input">
         @for (tipo of tiposChave; track tipo) {
-          <option [value]="tipo">{{ tipo }}</option>
+          <option [value]="tipo">{{ chaveLabels[tipo] }}</option>
         }
       </select>
     </div>
