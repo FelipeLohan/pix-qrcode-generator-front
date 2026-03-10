@@ -7,7 +7,8 @@ import { QrDisplayComponent } from '../qr-display/qr-display.component';
 
 /** Validadores de formato por tipo de chave — usado apenas no frontend. */
 const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
-  CPF:      Validators.pattern(/^\d{11}$/),
+  // CPF valida o valor já formatado (000.000.000-00)
+  CPF:      Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/),
   CNPJ:     Validators.pattern(/^\d{14}$/),
   EMAIL:    Validators.email,
   TELEFONE: Validators.pattern(/^\+55\d{10,11}$/),
@@ -69,12 +70,12 @@ export class PixFormComponent implements OnInit {
 
     const input = event.target as HTMLInputElement;
     const digits = input.value.replace(/\D/g, '').slice(0, 11);
+    const formatted = formatCpf(digits);
 
-    // Atualiza o display com máscara
-    input.value = formatCpf(digits);
-
-    // Form control armazena apenas os dígitos (valor enviado ao backend)
-    this.form.get('chavePix')!.setValue(digits, { emitEvent: false });
+    // Armazena o valor formatado no form control.
+    // O Angular chama writeValue(formatted) e escreve de volta ao input,
+    // preservando a máscara sem conflito com o DefaultValueAccessor.
+    this.form.get('chavePix')!.setValue(formatted, { emitEvent: false });
     this.form.get('chavePix')!.markAsTouched();
   }
 
@@ -93,10 +94,15 @@ export class PixFormComponent implements OnInit {
     this.errorMsg.set(null);
     this.qrCodeResult.set(null);
 
-    const { chavePix, nomeRecebedor, cidade } = this.form.getRawValue();
+    const { tipoChave, chavePix, nomeRecebedor, cidade } = this.form.getRawValue();
+
+    // CPF: envia apenas os dígitos (sem pontuação) para o backend
+    const chaveParaEnviar = tipoChave === 'CPF'
+      ? chavePix!.replace(/\D/g, '')
+      : chavePix!;
 
     this.pixService.gerarQrCode({
-      chavePix:      chavePix!,
+      chavePix:      chaveParaEnviar,
       nomeRecebedor: nomeRecebedor!,
       cidade:        cidade!,
     }).subscribe({
