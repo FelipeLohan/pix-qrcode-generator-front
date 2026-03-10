@@ -9,7 +9,8 @@ import { QrDisplayComponent } from '../qr-display/qr-display.component';
 const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
   // CPF valida o valor já formatado (000.000.000-00)
   CPF:      Validators.pattern(/^\d{3}\.\d{3}\.\d{3}-\d{2}$/),
-  CNPJ:     Validators.pattern(/^\d{14}$/),
+  // CNPJ valida o valor já formatado (00.000.000/0000-00)
+  CNPJ:     Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/),
   EMAIL:    Validators.email,
   TELEFONE: Validators.pattern(/^\+55\d{10,11}$/),
   EVP:      Validators.pattern(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
@@ -17,7 +18,7 @@ const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
 
 const CHAVE_PLACEHOLDERS: Record<TipoChave, string> = {
   CPF:      '000.000.000-00',
-  CNPJ:     '00000000000000',
+  CNPJ:     '00.000.000/0000-00',
   EMAIL:    'exemplo@email.com',
   TELEFONE: '+5511999999999',
   EVP:      'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
@@ -28,6 +29,14 @@ function formatCpf(digits: string): string {
   if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
   if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+}
+
+function formatCnpj(digits: string): string {
+  if (digits.length <= 2)  return digits;
+  if (digits.length <= 5)  return `${digits.slice(0, 2)}.${digits.slice(2)}`;
+  if (digits.length <= 8)  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5)}`;
+  if (digits.length <= 12) return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8)}`;
+  return `${digits.slice(0, 2)}.${digits.slice(2, 5)}.${digits.slice(5, 8)}/${digits.slice(8, 12)}-${digits.slice(12, 14)}`;
 }
 
 @Component({
@@ -66,17 +75,21 @@ export class PixFormComponent implements OnInit {
   }
 
   onChavePixInput(event: Event): void {
-    if (this.form.get('tipoChave')!.value !== 'CPF') return;
+    const tipo = this.form.get('tipoChave')!.value;
+    if (tipo !== 'CPF' && tipo !== 'CNPJ') return;
 
     const input = event.target as HTMLInputElement;
-    const digits = input.value.replace(/\D/g, '').slice(0, 11);
-    const formatted = formatCpf(digits);
+    const chaveCtrl = this.form.get('chavePix')!;
 
-    // Armazena o valor formatado no form control.
-    // O Angular chama writeValue(formatted) e escreve de volta ao input,
-    // preservando a máscara sem conflito com o DefaultValueAccessor.
-    this.form.get('chavePix')!.setValue(formatted, { emitEvent: false });
-    this.form.get('chavePix')!.markAsTouched();
+    if (tipo === 'CPF') {
+      const digits = input.value.replace(/\D/g, '').slice(0, 11);
+      chaveCtrl.setValue(formatCpf(digits), { emitEvent: false });
+    } else {
+      const digits = input.value.replace(/\D/g, '').slice(0, 14);
+      chaveCtrl.setValue(formatCnpj(digits), { emitEvent: false });
+    }
+
+    chaveCtrl.markAsTouched();
   }
 
   hasError(field: keyof typeof this.form.controls): boolean {
@@ -96,8 +109,8 @@ export class PixFormComponent implements OnInit {
 
     const { tipoChave, chavePix, nomeRecebedor, cidade } = this.form.getRawValue();
 
-    // CPF: envia apenas os dígitos (sem pontuação) para o backend
-    const chaveParaEnviar = tipoChave === 'CPF'
+    // CPF e CNPJ: envia apenas os dígitos (sem pontuação) para o backend
+    const chaveParaEnviar = (tipoChave === 'CPF' || tipoChave === 'CNPJ')
       ? chavePix!.replace(/\D/g, '')
       : chavePix!;
 
