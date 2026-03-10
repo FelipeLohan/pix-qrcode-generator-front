@@ -12,7 +12,8 @@ const CHAVE_VALIDATORS: Record<TipoChave, ValidatorFn> = {
   // CNPJ valida o valor já formatado (00.000.000/0000-00)
   CNPJ:     Validators.pattern(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/),
   EMAIL:    Validators.email,
-  TELEFONE: Validators.pattern(/^\+55\d{10,11}$/),
+  // TELEFONE valida o valor já formatado ((DD) XXXXX-XXXX ou (DD) XXXX-XXXX)
+  TELEFONE: Validators.pattern(/^\(\d{2}\) \d{4,5}-\d{4}$/),
   EVP:      Validators.pattern(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
 };
 
@@ -20,7 +21,7 @@ const CHAVE_PLACEHOLDERS: Record<TipoChave, string> = {
   CPF:      '000.000.000-00',
   CNPJ:     '00.000.000/0000-00',
   EMAIL:    'exemplo@email.com',
-  TELEFONE: '+5511999999999',
+  TELEFONE: '(81) 90000-0000',
   EVP:      'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
 };
 
@@ -29,6 +30,13 @@ function formatCpf(digits: string): string {
   if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`;
   if (digits.length <= 9) return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`;
   return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`;
+}
+
+function formatTelefone(digits: string): string {
+  if (digits.length <= 2)  return digits;
+  if (digits.length <= 6)  return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
 }
 
 function formatCnpj(digits: string): string {
@@ -76,7 +84,7 @@ export class PixFormComponent implements OnInit {
 
   onChavePixInput(event: Event): void {
     const tipo = this.form.get('tipoChave')!.value;
-    if (tipo !== 'CPF' && tipo !== 'CNPJ') return;
+    if (tipo !== 'CPF' && tipo !== 'CNPJ' && tipo !== 'TELEFONE') return;
 
     const input = event.target as HTMLInputElement;
     const chaveCtrl = this.form.get('chavePix')!;
@@ -84,9 +92,12 @@ export class PixFormComponent implements OnInit {
     if (tipo === 'CPF') {
       const digits = input.value.replace(/\D/g, '').slice(0, 11);
       chaveCtrl.setValue(formatCpf(digits), { emitEvent: false });
-    } else {
+    } else if (tipo === 'CNPJ') {
       const digits = input.value.replace(/\D/g, '').slice(0, 14);
       chaveCtrl.setValue(formatCnpj(digits), { emitEvent: false });
+    } else {
+      const digits = input.value.replace(/\D/g, '').slice(0, 11);
+      chaveCtrl.setValue(formatTelefone(digits), { emitEvent: false });
     }
 
     chaveCtrl.markAsTouched();
@@ -109,8 +120,9 @@ export class PixFormComponent implements OnInit {
 
     const { tipoChave, chavePix, nomeRecebedor, cidade } = this.form.getRawValue();
 
-    // CPF e CNPJ: envia apenas os dígitos (sem pontuação) para o backend
-    const chaveParaEnviar = (tipoChave === 'CPF' || tipoChave === 'CNPJ')
+    // CPF, CNPJ e TELEFONE: envia apenas os dígitos (sem pontuação) para o backend
+    // Para TELEFONE o backend é responsável por prefixar +55
+    const chaveParaEnviar = (tipoChave === 'CPF' || tipoChave === 'CNPJ' || tipoChave === 'TELEFONE')
       ? chavePix!.replace(/\D/g, '')
       : chavePix!;
 
