@@ -127,6 +127,7 @@ export class PixFormComponent implements OnInit {
       : chavePix!;
 
     this.pixService.gerarQrCode({
+      tipoChave:     tipoChave!,
       chavePix:      chaveParaEnviar,
       nomeRecebedor: nomeRecebedor!,
       cidade:        cidade!,
