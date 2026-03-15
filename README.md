@@ -42,7 +42,7 @@ O frontend se comunica com uma API Spring Boot que monta o payload BR Code e ret
 
 ### Pré-requisitos
 - Node.js 22+
-- API backend rodando em `http://localhost:8080`
+- API backend rodando em `http://localhost:8080` → [pix-qrcode-generator-back](https://github.com/FelipeLohan/pix-qrcode-generator-back)
 
 ### Instalação
 
@@ -90,7 +90,7 @@ A variável `BACKEND_URL` define o endereço da API de backend. O Nginx atua com
 ## Backend
 
 O backend correspondente (Spring Boot) está disponível em:
-[github.com/FelipeLohan/pix-qrcode-generator-api](https://github.com/FelipeLohan/pix-qrcode-generator-api)
+[github.com/FelipeLohan/pix-qrcode-generator-back](https://github.com/FelipeLohan/pix-qrcode-generator-back)
 
 ---
 
