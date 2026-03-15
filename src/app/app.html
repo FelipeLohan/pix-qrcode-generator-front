@@ -4,20 +4,25 @@
 
 <footer class="mt-8 pb-6 text-center text-xs text-slate-400 space-y-1 px-4">
   <p>🔒 Nenhum dado é armazenado. As informações são usadas apenas para gerar o QR Code.</p>
-  <p>
-    Projeto de portfólio por
+  <p>Projeto de portfólio por <strong class="text-slate-500">Felipe Lohan</strong></p>
+  <div class="flex items-center justify-center gap-4 pt-1">
     <a
       href="https://www.linkedin.com/in/felipe-lohan-767294213/"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-brand hover:text-brand-dark underline underline-offset-2 transition-colors"
-    >Felipe Lohan</a>
-    &nbsp;·&nbsp;
+      class="flex items-center gap-1.5 text-slate-400 hover:text-brand transition-colors"
+    >
+      <lucide-icon [img]="Linkedin" size="14" />
+      LinkedIn
+    </a>
     <a
       href="https://github.com/FelipeLohan/pix-qrcode-generator-front"
       target="_blank"
       rel="noopener noreferrer"
-      class="text-brand hover:text-brand-dark underline underline-offset-2 transition-colors"
-    >GitHub</a>
-  </p>
+      class="flex items-center gap-1.5 text-slate-400 hover:text-brand transition-colors"
+    >
+      <lucide-icon [img]="Github" size="14" />
+      GitHub
+    </a>
+  </div>
 </footer>
